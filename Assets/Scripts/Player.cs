@@ -22,6 +22,19 @@ public class Player : MonoBehaviour
 
     Vector3 moveDir;
 
+    [Header("벽점프기능")]
+    [SerializeField] bool wallStep = false;//벽점프를 할수 있는 조건
+    bool isWallStep;//중력조건에서 벽점프를 하게 할지
+    [SerializeField] float wallStepTime = 0.3f;//몇초동안 유저가 입력할 수 없도록 할 것인지
+    float wallStepTimer = 0.0f;//타이머
+
+    [Header("대시기능")]
+    [SerializeField] float dashTime = 0.3f;
+    float dashTimer = 0.0f;//타이머
+    [SerializeField] float dashCoolTime = 2.0f;
+    float dashCoolTimer;
+    TrailRenderer tr;
+
     private void OnDrawGizmos()
     {
         if(showRay == true)
@@ -36,6 +49,8 @@ public class Player : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         boxColl = GetComponent<BoxCollider2D>();
+        tr = GetComponent<TrailRenderer>();
+        tr.enabled = false;
     }
 
     void Start()
@@ -52,6 +67,10 @@ public class Player : MonoBehaviour
         doJump();
 
         checkGravity();
+
+        doDash();
+
+        checkTimers();
 
     }
 
@@ -73,6 +92,8 @@ public class Player : MonoBehaviour
 
     private void moving()
     {
+        if (wallStepTimer != 0.0f||dashTimer != 0.0f) return;//만약 벽점프 타이머가 기동중이면 이동 불가
+
         moveDir.x = Input.GetAxisRaw("Horizontal") * moveSpeed;//-1,0,1
         moveDir.y = rigid.velocity.y;
         rigid.velocity = moveDir;
@@ -90,17 +111,55 @@ public class Player : MonoBehaviour
 
     private void doJump()//플레이어가 스페이스키를 누른다면 점프 할 수 있게 준비
     {
-        if (isGround == false) return;
-
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (isGround == false)//공중에 떠 있을때
         {
-            isJump = true;
+            if(Input.GetKeyDown(KeyCode.Space)&&wallStep == true&&moveDir.x != 0)
+            {
+                isWallStep = true;
+            }
+        }
+
+        else//바닥에 있을때
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                isJump = true;
+            }
+        }
+    }
+
+    private void doDash()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftShift)&&dashTimer == 0.0f&&dashCoolTimer == 0.0f)
+        {
+            verticalVelocity = 0.0f;
+
+            bool dirRight = transform.localScale.x == -1;//오른쪽을 보는지
+            rigid.velocity = new Vector2(dirRight == true ? 20.0f:-20.0f ,verticalVelocity);
+
+            dashTimer = dashTime;
+            dashCoolTimer = dashCoolTime;
+
+            tr.enabled = true;
         }
     }
 
     private void checkGravity()
     {
-        if (isGround == false)//공중에 있을때
+        if (dashTimer != 0.0f) return;
+
+        if(isWallStep == true)
+        {
+            isWallStep= false;
+
+            Vector2 dir = rigid.velocity;
+            dir.x *= -1;
+            rigid.velocity = dir;//현재 보는 방향의 반대
+            verticalVelocity = jumpForce;
+
+            wallStepTimer = wallStepTime;//벽접프 입력불가 대기시간을 타이머에 입력
+        }
+        else if (isGround == false)//공중에 있을때
         {
             verticalVelocity -= 9.81f*Time.deltaTime;
 
@@ -123,6 +182,62 @@ public class Player : MonoBehaviour
         }
 
         rigid.velocity = new Vector2(rigid.velocity.x, verticalVelocity);
+    }
+
+    public void TriggerEnter(HitBox.enumHitType _hitType, Collider2D _coll)
+    {
+        switch (_hitType)
+        {
+            case HitBox.enumHitType.WallCheck:
+                wallStep = true;
+                break;
+
+            case HitBox.enumHitType.ItemCheck:
+
+                break;
+        }
+    }
+
+    public void TriggerExit(HitBox.enumHitType _hitType, Collider2D _coll)
+    {
+        switch (_hitType)
+        {
+            case HitBox.enumHitType.WallCheck:
+                wallStep= false;
+                break;
+        }
+    }
+
+    private void checkTimers()
+    {
+        if(wallStepTimer > 0.0f)
+        {
+            wallStepTimer -= Time.deltaTime;
+            if(wallStepTimer < 0.0f)
+            {
+                wallStepTimer = 0.0f;
+            }
+        }
+
+        if(dashTimer > 0.0f)
+        {
+            dashTimer -= Time.deltaTime;
+            if (dashTimer < 0.0f)
+            {
+                dashTimer = 0.0f;
+                tr.enabled = false;
+                tr.Clear();
+            }
+        }
+
+        if(dashCoolTimer > 0.0f)
+        {
+            dashCoolTimer -= Time.deltaTime;
+            if (dashCoolTimer < 0.0f)
+            {
+                dashCoolTimer = 0.0f;
+            }
+        }
     }
 
 }
