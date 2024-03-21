@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
@@ -35,6 +37,10 @@ public class Player : MonoBehaviour
     float dashCoolTimer;
     TrailRenderer tr;
 
+    [Header("대시스킬 화면 연출")]
+    [SerializeField] Image effect;
+    [SerializeField] TMP_Text textCool;
+
     private void OnDrawGizmos()
     {
         if(showRay == true)
@@ -66,11 +72,15 @@ public class Player : MonoBehaviour
 
         doJump();
 
+        checkAim();
         checkGravity();
 
         doDash();
 
         checkTimers();
+
+        //ui
+        checkUiCoolDown();
 
     }
 
@@ -142,6 +152,15 @@ public class Player : MonoBehaviour
 
             tr.enabled = true;
         }
+    }
+
+    private void checkAim()
+    {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = transform.position.z;
+
+        float angle = Quaternion.FromToRotation(Vector3.up, mousePos - transform.position).eulerAngles.z;
+        Debug.Log(360 - angle);
     }
 
     private void checkGravity()
@@ -238,6 +257,15 @@ public class Player : MonoBehaviour
                 dashCoolTimer = 0.0f;
             }
         }
+    }
+
+    private void checkUiCoolDown()
+    {
+        textCool.gameObject.SetActive(dashCoolTimer != 0.0f);
+        textCool.text = (Mathf.CeilToInt(dashCoolTimer)).ToString();
+
+        float anount = 1 - dashCoolTimer / dashCoolTime;
+        effect.fillAmount = anount;
     }
 
 }
