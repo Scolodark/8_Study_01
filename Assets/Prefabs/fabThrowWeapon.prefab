@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1733326870682452007}
   - component: {fileID: 5556676152826259292}
   - component: {fileID: 8249965156573915124}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: fabThrowWeapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33,7 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7227274583617798492
 SpriteRenderer:
@@ -171,3 +171,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c4c45737cb668b499b314b3697120de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isTriggerTime: 1
+  col: {fileID: 5556676152826259292}

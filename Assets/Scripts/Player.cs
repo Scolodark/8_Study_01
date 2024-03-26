@@ -46,6 +46,7 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject objSword;
     [SerializeField] Transform trsSword;//위치와 각도를 가져옴
     [SerializeField] float throwForce;
+    bool isRight;
 
     private void OnDrawGizmos()
     {
@@ -167,7 +168,7 @@ public class Player : MonoBehaviour
         mousePos.z = transform.position.z;
 
         Vector3 newPos = mousePos - transform.position;
-        bool isRight = newPos.x > 0f ? true:false;
+        isRight = newPos.x > 0f ? true:false;
 
         if(newPos.x > 0 && transform.localScale.x != -1.0f)//쳐다보는 것
         {
@@ -193,6 +194,8 @@ public class Player : MonoBehaviour
         {
             GameObject go = Instantiate(objSword, trsSword.position, trsSword.rotation);
             ThrowWeapon gosc = go.GetComponent<ThrowWeapon>();
+            Vector2 throwForce = isRight == true ? new Vector2(10f, 0f) : new Vector2(-10f, 0f);
+            gosc.SetForce(trsSword.rotation * throwForce,isRight);
         }
     }
 

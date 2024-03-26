@@ -8,6 +8,19 @@ public class ThrowWeapon : MonoBehaviour
     Vector2 force;
     bool isRight;
 
+    [SerializeField] float isTriggerTime = 1.0f;
+    float timer;
+    bool doTrigger = false;
+    [SerializeField] Collider2D col;
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(doTrigger == false)
+        {
+            doTrigger = true;
+        }
+    }
+
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -20,7 +33,16 @@ public class ThrowWeapon : MonoBehaviour
 
     void Update()
     {
-        transform.Rotate(new Vector3(0f, 0f, isRight == true ? -360f : 360f));//rotate조사
+        transform.Rotate(new Vector3(0f, 0f, isRight == true ? -360f : 360f)* Time.deltaTime);//rotate조사
+
+        if(doTrigger == true)
+        {
+            timer += Time.deltaTime;
+            if(timer >= isTriggerTime)
+            {
+                col.isTrigger = true;
+            }
+        }
     }
 
     public void SetForce(Vector2 _force, bool _isRight)
