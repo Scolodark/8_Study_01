@@ -43,7 +43,6 @@ public class DragableUi : MonoBehaviour,IBeginDragHandler, IDragHandler, IEndDra
 
     private void Awake()//내 기능을 정의할때
     {
-        img = GetComponent<Image>();
         rect = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
     }
@@ -55,6 +54,10 @@ public class DragableUi : MonoBehaviour,IBeginDragHandler, IDragHandler, IEndDra
 
     public void SetItem(Sprite _spr)
     {
+        if (img == null)
+        {
+            img = GetComponent<Image>();
+        }
         img.sprite = _spr;
         //img.SetNativeSize(); <= 이미지 크기 맞춰서 조절해주는 기능
     }

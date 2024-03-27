@@ -190,7 +190,8 @@ public class Player : MonoBehaviour
 
     private void shootWeapon()
     {
-        if(Input.GetKeyDown(KeyCode.Mouse0))
+
+        if(Input.GetKeyDown(KeyCode.Mouse0) && InventoryManager.Instance.isActiveInventory() == false)
         {
             GameObject go = Instantiate(objSword, trsSword.position, trsSword.rotation);
             ThrowWeapon gosc = go.GetComponent<ThrowWeapon>();
@@ -248,6 +249,18 @@ public class Player : MonoBehaviour
                 break;
 
             case HitBox.enumHitType.ItemCheck:
+                //지금 접촉한 대상이 아이템이 맞는지 체크
+                ItemSetting item = _coll.GetComponent<ItemSetting>();
+                if (item != null)
+                {
+                    item.GetItem();
+                }
+
+                //if(_coll.gameObject.tag == "Item")
+                //if(_coll.gameObject.layer == LayerMask.NameToLayer(""))
+                //{
+
+                //}
 
                 break;
         }

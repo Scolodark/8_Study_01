@@ -92,8 +92,15 @@ public class InventoryManager : MonoBehaviour
         }
 
         //Todo
-        Instantiate(objitem);
+        GameObject go = Instantiate(objitem, listInventory[slotNum]);
+        DragableUi ui = go.GetComponent<DragableUi>();
+        ui.SetItem(_spr);
 
         return true;//아이템 생성 성공
+    }
+
+    public bool isActiveInventory()
+    {
+        return objInventory.activeSelf;
     }
 }
